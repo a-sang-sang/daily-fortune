@@ -1,5 +1,6 @@
 // 2) 템플릿 + fortune-data.json → 캐러셀용 여러 장의 PNG 렌더링
-// 슬라이드 구성: 1장(오늘의 주인공, 크게) + 나머지 11개 띠를 2개씩 묶은 장들
+// 슬라이드 구성: 1장(오늘의 주인공, 크게) + 나머지 11개 띠 중 최대한 많은 수를
+// 한 장에 1개씩(가장 크게) 배치하고, 10장 제한에 맞추기 위해 일부만 2개씩 묶음
 // 실행: node scripts/2-render-image.js
 
 const fs = require('fs');
@@ -21,6 +22,10 @@ const ZODIAC = [
   { key: 'pig',     icon: '🐷', name: '돼지띠' },
 ];
 
+const MAX_CAROUSEL_SLIDES = 10; // 인스타그램 API 캐러셀 한도
+const HERO_SLIDES = 1;
+
+// 남은 띠들을 2개씩 묶는다 (11개라 마지막 한 묶음만 1개가 됨)
 function chunkPairs(arr, size) {
   const out = [];
   for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
@@ -33,14 +38,13 @@ async function renderImage() {
 
   const hero = ZODIAC.find((z) => z.key === data.heroKey);
   const rest = ZODIAC.filter((z) => z.key !== data.heroKey);
-  const pairs = chunkPairs(rest, 2); // 11개 -> 6묶음(5개는 2개씩, 마지막 1개)
+  const groups = chunkPairs(rest, 2);
 
-  const totalPages = 1 + pairs.length; // 항상 10 이하 (보통 7장)
+  const totalPages = HERO_SLIDES + groups.length;
 
   const outDir = path.join(__dirname, '..', 'output');
   fs.mkdirSync(outDir, { recursive: true });
 
-  // 이전 실행에서 남은 png 정리 (개수가 날마다 같아서 보통 필요 없지만 안전하게)
   for (const f of fs.readdirSync(outDir)) {
     if (f.endsWith('.png')) fs.unlinkSync(path.join(outDir, f));
   }
@@ -63,12 +67,12 @@ async function renderImage() {
 
   await renderOne(page, heroHtml, path.join(outDir, 'fortune-01.png'));
 
-  // --- 2번 슬라이드부터: 2개씩 묶은 페이지들 ---
+  // --- 2번 슬라이드부터: 그룹별로 1개 또는 2개씩 ---
   const pairTemplatePath = path.join(__dirname, '..', 'templates', 'fortune-card-pair.template.html');
   const pairTemplateRaw = fs.readFileSync(pairTemplatePath, 'utf-8');
 
-  for (let i = 0; i < pairs.length; i++) {
-    const group = pairs[i];
+  for (let i = 0; i < groups.length; i++) {
+    const group = groups[i];
     const rowsHtml = group
       .map(
         (z) => `
