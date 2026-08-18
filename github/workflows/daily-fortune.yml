@@ -1,0 +1,60 @@
+name: daily-zodiac-fortune
+
+on:
+  schedule:
+    # UTC 22:00 = KST 07:00 (다음날)
+    - cron: '0 22 * * *'
+  workflow_dispatch: {} # 수동 실행 버튼 (테스트용)
+
+permissions:
+  contents: write # 이미지 커밋/푸시를 위해 필요
+
+jobs:
+  post-fortune:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pipeline
+    steps:
+      - name: 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Node.js 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 의존성 설치
+        run: npm install
+
+      - name: 1) 오늘의 운세 생성 (Claude API)
+        run: npm run generate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: 2) 이미지 렌더링 (Puppeteer)
+        run: npm run render
+
+      - name: 3) 생성된 이미지 커밋 & 푸시
+        id: commit
+        run: |
+          git config user.name "fortune-bot"
+          git config user.email "fortune-bot@users.noreply.github.com"
+          git add output/*.png
+          git commit -m "chore: 오늘의 운세 이미지 $(date +'%Y-%m-%d')" || echo "변경사항 없음"
+          git push
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: 4) 인스타그램 게시
+        run: |
+          IMAGE_FILE=$(ls output/*.png | head -n 1)
+          echo "IMAGE_REL_PATH=pipeline/${IMAGE_FILE}" >> "$GITHUB_ENV"
+        
+      - name: 인스타그램 업로드 실행
+        run: npm run post
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_ACCOUNT_ID: ${{ secrets.IG_ACCOUNT_ID }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ steps.commit.outputs.sha }}
+          IMAGE_REL_PATH: ${{ env.IMAGE_REL_PATH }}
