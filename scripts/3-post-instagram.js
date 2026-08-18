@@ -64,8 +64,7 @@ async function postToInstagram() {
   console.log('아이템 컨테이너', childIds.length, '개 생성 완료');
 
   // 2) 캐러셀(부모) 컨테이너 생성
-  const caption = buildCaption();
-  const carouselRes = await fetch(`${API_BASE}/${API_VERSION}/${IG_ACCOUNT_ID}/media`, {
+  const caption = buildCaption();  const carouselRes = await fetch(`${API_BASE}/${API_VERSION}/${IG_ACCOUNT_ID}/media`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -118,9 +117,14 @@ async function waitUntilReady(containerId, token, maxTries = 15) {
 }
 
 function buildCaption() {
-  const today = new Date();
+  // new Date()를 여기서 다시 계산하면 GitHub Actions 서버(UTC) 기준으로 하루 어긋날 수 있어서,
+  // 1단계에서 한국시간 기준으로 이미 정확하게 계산해둔 날짜를 그대로 재사용해요.
+  const dataPath = path.join(__dirname, '..', 'data', 'fortune-data.json');
+  const data = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
+  const { month, day } = data.date;
+
   return [
-    `${today.getMonth() + 1}월 ${today.getDate()}일, 오늘의 12간지 운세 🔮`,
+    `${month}월 ${day}일, 오늘의 12간지 운세 🔮`,
     '',
     '옆으로 넘겨서 내 띠 운세 확인해보세요 👉',
     '나의 띠 운세는 어땠나요? 댓글로 알려주세요 💬',
