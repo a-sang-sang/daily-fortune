@@ -25,6 +25,9 @@ async function postToInstagram() {
   }
 
   const outDir = path.join(__dirname, '..', 'output');
+  // 캐시 무효화용 값 — 실행할 때마다 달라져야 해서 현재 시각을 사용해요
+  const cacheBuster = Date.now();
+
   const files = fs
     .readdirSync(outDir)
     .filter((f) => f.endsWith('.png'))
@@ -42,7 +45,10 @@ async function postToInstagram() {
   // 1) 각 이미지를 캐러셀 아이템(child) 컨테이너로 생성
   const childIds = [];
   for (const file of files) {
-    const imageUrl = `https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_SHA}/output/${file}`;
+    // 주소 끝에 커밋 번호를 붙여서 캐시 무효화 (5분 캐시 때문에 옛날 이미지가
+    // 잘못 전달되는 걸 방지 — main 브랜치 주소는 최신 커밋을 가리키지만,
+    // 짧은 시간 안에 반복 실행하면 캐시된 옛날 이미지가 나올 수 있어요)
+    const imageUrl = `https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/output/${file}?v=${cacheBuster}`;
     console.log('아이템 컨테이너 생성 중:', imageUrl);
 
     const res = await fetch(`${API_BASE}/${API_VERSION}/${IG_ACCOUNT_ID}/media`, {
