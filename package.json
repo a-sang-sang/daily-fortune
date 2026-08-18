@@ -1,0 +1,14 @@
+{
+  "name": "daily-zodiac-fortune-pipeline",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "generate": "node scripts/1-generate-fortune.js",
+    "render": "node scripts/2-render-image.js",
+    "post": "node scripts/3-post-instagram.js",
+    "all": "npm run generate && npm run render && npm run post"
+  },
+  "dependencies": {
+    "puppeteer": "^23.0.0"
+  }
+}
