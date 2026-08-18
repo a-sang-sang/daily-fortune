@@ -1,10 +1,82 @@
-{{PAGE_NUM}} / {{TOTAL_PAGES}}
-DAILY FORTUNE
-오늘의 띠별 운세
-{{MONTH}}월
-{{DAY}}
-{{HERO_ICON}}
-오늘의 주인공
-{{HERO_NAME}}
-{{HERO_FORTUNE}}
-옆으로 넘겨서 12간지 전체 운세 보기 ▶
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>오늘의 띠별 운세</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF5EC; --card:#FFFFFF; --ink:#4A3F35; --ink-soft:#8A7B6C;
+    --coral:#FF9B85; --mint:#A9DCC9; --butter:#FFD873; --line:#EFE4D6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    width:1080px; height:1080px; background:var(--cream);
+    background-image:
+      radial-gradient(circle at 90% 8%, rgba(169,220,201,0.35) 0%, transparent 35%),
+      radial-gradient(circle at 6% 92%, rgba(255,155,133,0.25) 0%, transparent 32%);
+    font-family:'Gowun Dodum', sans-serif; color:var(--ink); position:relative; overflow:hidden;
+  }
+  .header{ padding:64px 72px 8px; display:flex; justify-content:space-between; align-items:flex-start; }
+  .eyebrow{ font-size:20px; color:var(--ink-soft); letter-spacing:2px; }
+  .title{ font-family:'Jua', sans-serif; font-size:56px; margin-top:6px; }
+  .title span{ color:var(--coral); }
+  .seal{
+    width:104px; height:104px; border-radius:50%; background:var(--coral);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    color:#fff; font-family:'Jua', sans-serif;
+    box-shadow:0 6px 14px rgba(255,155,133,0.4); transform:rotate(6deg); flex-shrink:0;
+  }
+  .seal .month{ font-size:15px; opacity:0.9; }
+  .seal .day{ font-size:34px; line-height:1; margin-top:2px; }
+
+  .hero-wrap{
+    margin:40px 90px 0; background:var(--card); border-radius:40px; padding:80px 60px;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    box-shadow:0 14px 30px rgba(74,63,53,0.07); border:2px solid var(--line);
+  }
+  .hero-badge{
+    width:200px; height:200px; border-radius:50%; background:var(--butter);
+    display:flex; align-items:center; justify-content:center; font-size:110px;
+    margin-bottom:32px;
+  }
+  .hero-tag{
+    display:inline-block; font-family:'Jua', sans-serif; font-size:20px;
+    background:var(--coral); color:#fff; padding:8px 22px; border-radius:100px; margin-bottom:18px;
+  }
+  .hero-name{ font-family:'Jua', sans-serif; font-size:52px; margin-bottom:24px; }
+  .hero-fortune{ font-size:28px; color:var(--ink-soft); line-height:1.7; max-width:760px; }
+
+  .swipe-hint{
+    position:absolute; bottom:44px; left:0; right:0; text-align:center;
+    font-family:'Jua', sans-serif; font-size:20px; color:var(--coral);
+  }
+  .page-indicator{
+    position:absolute; top:78px; left:72px; font-size:16px; color:var(--ink-soft); letter-spacing:1px;
+  }
+</style>
+</head>
+<body>
+  <div class="page-indicator">{{PAGE_NUM}} / {{TOTAL_PAGES}}</div>
+  <div class="header">
+    <div>
+      <div class="eyebrow">DAILY FORTUNE</div>
+      <div class="title">오늘의 <span>띠별</span> 운세</div>
+    </div>
+    <div class="seal">
+      <div class="month">{{MONTH}}월</div>
+      <div class="day">{{DAY}}</div>
+    </div>
+  </div>
+
+  <div class="hero-wrap">
+    <div class="hero-badge">{{HERO_ICON}}</div>
+    <div class="hero-tag">오늘의 주인공</div>
+    <div class="hero-name">{{HERO_NAME}}</div>
+    <div class="hero-fortune">{{HERO_FORTUNE}}</div>
+  </div>
+
+  <div class="swipe-hint">옆으로 넘겨서 12간지 전체 운세 보기 ▶</div>
+</body>
+</html>
