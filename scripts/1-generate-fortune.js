@@ -23,10 +23,23 @@ const ZODIAC = [
 // 참고: 정통 사주 명리학의 일진(60갑자)은 음력·절기 기반 계산이 필요해서 간단히 구현하기 어려워요.
 // 여기서는 콘텐츠에 변화를 주기 위해 날짜 기반으로 "오늘의 주인공"을 순환시키는 방식을 씁니다.
 // 실제 명리학적 정확도가 필요하면 별도 만세력 라이브러리 연동을 검토하세요.
-function pickHeroKey(date) {
+
+// GitHub Actions 서버는 UTC로 동작해서 new Date()를 그냥 쓰면 한국시간과 날짜가
+// 하루 어긋날 수 있어요 (UTC 22시 = 한국시간 다음날 07시). 그래서 한국시간(KST) 기준으로
+// 연/월/일을 직접 계산해요.
+function getKstDateParts() {
+  const now = new Date();
+  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000); // UTC + 9시간
+  const year = kst.getUTCFullYear();
+  const month = kst.getUTCMonth() + 1;
+  const day = kst.getUTCDate();
   const dayOfYear = Math.floor(
-    (date - new Date(date.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24)
+    (Date.UTC(year, month - 1, day) - Date.UTC(year, 0, 0)) / (1000 * 60 * 60 * 24)
   );
+  return { year, month, day, dayOfYear };
+}
+
+function pickHeroKey(dayOfYear) {
   return ZODIAC[dayOfYear % 12].key;
 }
 
@@ -34,10 +47,10 @@ async function generateFortunes() {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY 환경변수가 없습니다.');
 
-  const today = new Date();
-  const heroKey = pickHeroKey(today);
+  const { year, month, day, dayOfYear } = getKstDateParts();
+  const heroKey = pickHeroKey(dayOfYear);
 
-  const prompt = `오늘(${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일) 12간지 각각에 대한 운세를 만들어줘.
+  const prompt = `오늘(${year}년 ${month}월 ${day}일) 12간지 각각에 대한 운세를 만들어줘.
 
 조건:
 - 12간지 각각 한 줄 운세 (최대 22자, 이모지 1개 포함 가능)
@@ -88,7 +101,7 @@ async function generateFortunes() {
   const parsed = JSON.parse(cleaned);
 
   const output = {
-    date: { month: today.getMonth() + 1, day: today.getDate() },
+    date: { month, day },
     heroKey,
     heroFortune: parsed.hero_fortune,
     fortunes: parsed.fortunes,
