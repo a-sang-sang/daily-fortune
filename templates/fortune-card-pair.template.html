@@ -1,5 +1,63 @@
-DAILY FORTUNE
-{{MONTH}}월 {{DAY}}일
-{{PAGE_NUM}} / {{TOTAL_PAGES}}
-{{ROWS_HTML}}
-오늘도 좋은 하루 되세요 🌤️
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>띠별 운세</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF5EC; --card:#FFFFFF; --ink:#4A3F35; --ink-soft:#8A7B6C;
+    --coral:#FF9B85; --mint:#A9DCC9; --butter:#FFD873; --line:#EFE4D6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    width:1080px; height:1080px; background:var(--cream);
+    background-image:
+      radial-gradient(circle at 90% 8%, rgba(169,220,201,0.35) 0%, transparent 35%),
+      radial-gradient(circle at 6% 92%, rgba(255,155,133,0.25) 0%, transparent 32%);
+    font-family:'Gowun Dodum', sans-serif; color:var(--ink); position:relative; overflow:hidden;
+  }
+  .header{ padding:56px 72px 0; display:flex; justify-content:space-between; align-items:center; }
+  .eyebrow{ font-size:18px; color:var(--ink-soft); letter-spacing:2px; }
+  .date-chip{
+    font-family:'Jua', sans-serif; font-size:18px; background:var(--coral); color:#fff;
+    padding:8px 20px; border-radius:100px;
+  }
+  .page-indicator{ font-size:16px; color:var(--ink-soft); letter-spacing:1px; }
+
+  .rows{
+    margin:56px 80px 0; display:flex; flex-direction:column; gap:36px;
+  }
+  .row-card{
+    background:var(--card); border-radius:36px; padding:56px 56px;
+    display:flex; align-items:center; gap:44px;
+    box-shadow:0 12px 26px rgba(74,63,53,0.06); border:2px solid var(--line);
+  }
+  .row-icon{
+    width:150px; height:150px; border-radius:50%; background:var(--mint);
+    display:flex; align-items:center; justify-content:center; font-size:82px; flex-shrink:0;
+  }
+  .row-text .name{ font-family:'Jua', sans-serif; font-size:38px; margin-bottom:14px; }
+  .row-text .fortune{ font-size:26px; color:var(--ink-soft); line-height:1.6; }
+
+  .footer{
+    position:absolute; bottom:40px; left:0; right:0; text-align:center;
+    font-size:16px; color:var(--ink-soft); letter-spacing:1px;
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="eyebrow">DAILY FORTUNE</div>
+    <div class="date-chip">{{MONTH}}월 {{DAY}}일</div>
+    <div class="page-indicator">{{PAGE_NUM}} / {{TOTAL_PAGES}}</div>
+  </div>
+
+  <div class="rows">
+    {{ROWS_HTML}}
+  </div>
+
+  <div class="footer">오늘도 좋은 하루 되세요 🌤️</div>
+</body>
+</html>
