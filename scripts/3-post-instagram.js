@@ -39,7 +39,7 @@ async function postToInstagram() {
 
   // 1) 미디어 컨테이너 생성
   const createRes = await fetch(
-    `https://graph.facebook.com/${API_VERSION}/${IG_ACCOUNT_ID}/media`,
+    `https://graph.instagram.com/${API_VERSION}/${IG_ACCOUNT_ID}/media`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -62,7 +62,7 @@ async function postToInstagram() {
 
   // 3) 게시
   const publishRes = await fetch(
-    `https://graph.facebook.com/${API_VERSION}/${IG_ACCOUNT_ID}/media_publish`,
+    `https://graph.instagram.com/${API_VERSION}/${IG_ACCOUNT_ID}/media_publish`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -82,7 +82,7 @@ async function postToInstagram() {
 async function waitUntilReady(creationId, token, maxTries = 10) {
   for (let i = 0; i < maxTries; i++) {
     const res = await fetch(
-      `https://graph.facebook.com/${API_VERSION}/${creationId}?fields=status_code&access_token=${token}`
+      `https://graph.instagram.com/${API_VERSION}/${creationId}?fields=status_code&access_token=${token}`
     );
     const data = await res.json();
     console.log(`상태 확인 (${i + 1}/${maxTries}):`, data.status_code);
